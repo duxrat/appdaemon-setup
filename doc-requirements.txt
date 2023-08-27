@@ -17,7 +17,7 @@ alabaster==0.7.13
     # via sphinx
 astral==3.2
     # via appdaemon (pyproject.toml)
-async-timeout==4.0.2
+async-timeout==4.0.3
     # via aiohttp
 attrs==23.1.0
     # via aiohttp
