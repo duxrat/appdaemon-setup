@@ -35,7 +35,7 @@ charset-normalizer==3.1.0
     #   requests
 colorama==0.4.6
     # via sphinx-autobuild
-deepdiff==6.3.0
+deepdiff==6.4.1
     # via appdaemon (pyproject.toml)
 docutils==0.17.1
     # via
