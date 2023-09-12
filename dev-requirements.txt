@@ -142,7 +142,7 @@ uvloop==0.17.0 ; sys_platform != "win32"
     # via appdaemon (pyproject.toml)
 virtualenv==20.21.0
     # via pre-commit
-websocket-client==1.5.1
+websocket-client==1.6.3
     # via appdaemon (pyproject.toml)
 wheel==0.40.0
     # via pip-tools
