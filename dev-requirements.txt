@@ -102,7 +102,7 @@ pluggy==1.0.0
     # via pytest
 pre-commit==3.2.2 ; python_version > "3.7"
     # via appdaemon (pyproject.toml)
-pycodestyle==2.10.0
+pycodestyle==2.11.0
     # via flake8
 pyflakes==3.0.1
     # via flake8
