@@ -71,6 +71,7 @@ class HassPlugin(PluginBase):
         # Connections to HA
         self._session = None  # http connection pool for general use
         self.ws = None  # websocket dedicated for event loop
+        self.ws_id = 0
 
         # Cached state from HA
         self.metadata = None
@@ -123,6 +124,7 @@ class HassPlugin(PluginBase):
                 connector=conn,
                 headers=headers,
                 json_serialize=utils.convert_json,
+                trust_env=True
             )
         return self._session
 
@@ -294,7 +296,7 @@ class HassPlugin(PluginBase):
     #
 
     async def get_updates(self):  # noqa: C901
-        _id = 0
+        
         self.already_notified = False
         self.first_time = True
 
@@ -319,7 +321,7 @@ class HassPlugin(PluginBase):
         #
 
         while not self.stopping:
-            _id += 1
+            self.ws_id += 1
             try:
                 #
                 # Connect to websocket interface
@@ -329,11 +331,11 @@ class HassPlugin(PluginBase):
                 #
                 # Subscribe to event stream
                 #
-                sub = json.dumps({"id": _id, "type": "subscribe_events"})
+                sub = json.dumps({"id": self.ws_id, "type": "subscribe_events"})
                 await utils.run_in_executor(self, self.ws.send, sub)
                 result = json.loads(self.ws.recv())
-                if not (result["id"] == _id and result["type"] == "result" and result["success"] is True):
-                    self.logger.warning("Unable to subscribe to HA events, id = %s", _id)
+                if not (result["id"] == self.ws_id and result["type"] == "result" and result["success"] is True):
+                    self.logger.warning("Unable to subscribe to HA events, id = %s", self.ws_id)
                     self.logger.warning(result)
                     raise ValueError("Error subscribing to HA Events")
 
@@ -382,9 +384,10 @@ class HassPlugin(PluginBase):
 
                     self.update_perf(bytes_recv=len(ret), updates_recv=1)
 
-                    if not (result["id"] == _id and result["type"] == "event"):
-                        self.logger.warning("Unexpected result from Home Assistant, id = %s", _id)
-                        self.logger.warning(result)
+                    if result["type"] == "result":
+                        self.logger.error(result)
+                    elif not (result["id"] == self.ws_id and result["type"] == "event"):
+                        self.logger.warning("Unexpected result from Home Assistant, id = %s", self.ws_id)
 
                     if self.reading_messages is False:
                         if result["type"] == "event":
@@ -529,6 +532,17 @@ class HassPlugin(PluginBase):
                     result = await r.text()
                 else:
                     result = await r.json()
+            elif r.status == 400:
+                ws_msg = json.dumps({
+                    "type": "execute_script",
+                    "sequence": [{
+                        "service": f"{domain}.{service}",
+                        "data": data
+                    }],
+                    "id": 99999  # replace with dynamic ID if needed
+                })
+                await utils.run_in_executor(self, self.ws.send, ws_msg)
+                result = None
             else:
                 self.logger.warning(
                     "Error calling Home Assistant service %s/%s/%s",
