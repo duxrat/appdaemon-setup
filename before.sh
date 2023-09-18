@@ -1,0 +1,1 @@
+set -a && source "/Users/yepdev/.proxyman/proxyman_env_automatic_setup.sh" && set +a
