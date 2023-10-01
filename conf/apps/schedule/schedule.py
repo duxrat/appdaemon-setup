@@ -1,14 +1,16 @@
 import json
 from datetime import datetime, timedelta, time as dt_time
 
-from utils.base import App
+from utils.base import App, toggle
 
 
 class Schedule(App):
-    def initialize(self):
+    async def initialize(self):
+        await super().initialize()
         time = dt_time(17, 0, 0)
-        self.run_daily(self.schedule_events, time)
+        await self.run_daily(self.schedule_events, time)
 
+    @toggle("schedule")
     def schedule_events(self):
         current_date = datetime.now().date()
 
