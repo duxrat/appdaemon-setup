@@ -7,11 +7,11 @@ from utils.base import App, toggle
 class Schedule(App):
     async def initialize(self):
         await super().initialize()
-        time = dt_time(17, 0, 0)
+        time = dt_time(17, 00, 0)
         await self.run_daily(self.schedule_events, time)
 
     @toggle("schedule")
-    def schedule_events(self):
+    async def schedule_events(self, *args, **kwargs):
         current_date = datetime.now().date()
 
         with open("conf/apps/schedule/schedule.json", "r") as f:
@@ -34,7 +34,7 @@ class Schedule(App):
             dt = datetime.combine(current_date, time)
             if prev_event:
                 end_dt = dt
-                self.call_service(
+                await self.call_service(
                     "calendar/create_event",
                     summary=prev_event,
                     start_date_time=prev_time.isoformat(),
