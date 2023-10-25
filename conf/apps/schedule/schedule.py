@@ -1,4 +1,5 @@
 import json
+import os
 from datetime import datetime, timedelta, time as dt_time
 
 from utils.base import App, toggle
@@ -14,7 +15,12 @@ class Schedule(App):
     async def schedule_events(self, *args, **kwargs):
         current_date = datetime.now().date()
 
-        with open("conf/apps/schedule/schedule.json", "r") as f:
+        with open(
+            "conf/apps/schedule/schedule.json"
+            if os.environ.get("DEV") == "true"
+            else "/config/appdaemon/apps/apps/schedule/schedule.json",
+            "r",
+        ) as f:
             if current_date.weekday() >= 5:
                 events = json.load(f)["weekend"]
             else:

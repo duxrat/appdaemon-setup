@@ -1,10 +1,15 @@
+import datetime as dt
 import os
 from functools import wraps
 
 import appdaemon.plugins.hass.hassapi as hass
 
 entity_prefix = "input_boolean.conf_app_"
-apps = ["light", "checks", "schedule"]
+apps = ["light", "checks", "schedule", "music", "project"]
+
+
+async def nop():
+    return
 
 
 class App(hass.Hass):
@@ -19,16 +24,21 @@ class App(hass.Hass):
         name = entity.split(entity_prefix)[1]
         self.is_active[name] = new == "off" if os.environ.get("DEV") == "true" else new == "on"
 
+    def datetime(self) -> str:
+        return dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        # format in %Y-%m-%d %H:%M:%S
+
 
 def toggle(name):
+    if name not in apps:
+        raise KeyError(f"Add {name} to the apps list.")
+
     def decorator(func):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
-            if name not in self.is_active:
-                raise KeyError(f"Add {name} to the apps list.")
             if self.is_active[name]:
                 return await func(self, *args, **kwargs)
-            return None
+            return await nop()
 
         return wrapper
 
