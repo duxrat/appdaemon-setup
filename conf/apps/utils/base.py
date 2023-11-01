@@ -1,4 +1,5 @@
 import datetime as dt
+import inspect
 import os
 from functools import wraps
 
@@ -24,7 +25,7 @@ class App(hass.Hass):
         name = entity.split(entity_prefix)[1]
         self.is_active[name] = new == "off" if os.environ.get("DEV") == "true" else new == "on"
 
-    def datetime(self) -> str:
+    def datetime_str(self) -> str:
         return dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # format in %Y-%m-%d %H:%M:%S
 
@@ -34,10 +35,17 @@ def toggle(name):
         raise KeyError(f"Add {name} to the apps list.")
 
     def decorator(func):
+        sig = inspect.signature(func)
+
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
             if self.is_active[name]:
-                return await func(self, *args, **kwargs)
+                if len(sig.parameters) == 2:
+                    return await func(self, args[3])
+                elif len(sig.parameters) > 2:
+                    return await func(self, *args, **kwargs)
+                else:
+                    return await func(self)
             return await nop()
 
         return wrapper
