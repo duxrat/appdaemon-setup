@@ -6,7 +6,7 @@ from functools import wraps
 import appdaemon.plugins.hass.hassapi as hass
 
 entity_prefix = "input_boolean.conf_app_"
-apps = ["light", "checks", "schedule", "music", "project"]
+apps = ["dev", "light", "checks", "schedule", "music", "project"]
 
 
 async def nop():
@@ -43,7 +43,7 @@ def toggle(name):
                 if len(sig.parameters) == 2:
                     return await func(self, args[3])
                 elif len(sig.parameters) > 2:
-                    return await func(self, *args, **kwargs)
+                    return await func(self, *args)
                 else:
                     return await func(self)
             return await nop()

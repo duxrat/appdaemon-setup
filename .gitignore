@@ -71,3 +71,4 @@ venv
 # Ruff
 
 .ruff_cache
+conf/compiled
