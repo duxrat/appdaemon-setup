@@ -8,12 +8,13 @@ from utils.base import App, toggle
 class Schedule(App):
     async def initialize(self):
         await super().initialize()
-        time = dt_time(17, 00, 0)
+        time = dt_time(2, 00, 0)
         await self.run_daily(self.schedule_events, time)
 
     @toggle("schedule")
     async def schedule_events(self, *args, **kwargs):
         current_date = datetime.now().date()
+        weekday = current_date.weekday()
 
         with open(
             "conf/apps/schedule/schedule.json"
@@ -21,18 +22,24 @@ class Schedule(App):
             else "/config/appdaemon/apps/apps/schedule/schedule.json",
             "r",
         ) as f:
-            if current_date.weekday() >= 5:
-                events = json.load(f)["weekend"]
-            else:
-                events = json.load(f)["workday"]
+            schedule_data = {k: list(v.items()) for k, v in json.load(f).items()}
 
-        event_items = list(events.items())
-        first_item = event_items[0]
-        event_items.append(first_item)
+        if weekday == 4:
+            events = schedule_data["friday"]
+            events.append(schedule_data["saturday"][0])
+        elif weekday == 5:
+            events = schedule_data["saturday"]
+            events.append(schedule_data["sunday"][0])
+        elif weekday == 6:
+            events = schedule_data["sunday"]
+            events.append(schedule_data["workday"][0])
+        else:
+            events = schedule_data["workday"]
+            events.append(schedule_data["friday"][0])
 
         prev_time = None
         prev_event = None
-        for time_str, event in event_items:
+        for time_str, event in events:
             time = datetime.strptime(time_str, "%H:%M").time()
             if prev_time and time < prev_time.time():
                 current_date += timedelta(days=1)

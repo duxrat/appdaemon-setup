@@ -2,11 +2,12 @@ import datetime as dt
 import inspect
 import os
 from functools import wraps
+from typing import Any, Optional
 
 import appdaemon.plugins.hass.hassapi as hass
 
 entity_prefix = "input_boolean.conf_app_"
-apps = ["dev", "light", "checks", "schedule", "music", "project"]
+apps = ["dev", "light", "checks", "schedule", "music", "project", "sleep"]
 
 
 async def nop():
@@ -28,6 +29,15 @@ class App(hass.Hass):
     def datetime_str(self) -> str:
         return dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # format in %Y-%m-%d %H:%M:%S
+
+    def bool_state(
+        self,
+        entity_id: str = None,
+        default: Any = None,
+        copy: bool = True,
+        **kwargs: Optional[Any],
+    ) -> Any:
+        return super().get_state(entity_id, None, default, copy, **kwargs) == "on"
 
 
 def toggle(name):
