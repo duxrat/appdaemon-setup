@@ -1,4 +1,4 @@
-import datetime as dt
+from datetime import datetime
 import inspect
 import os
 from functools import wraps
@@ -27,17 +27,23 @@ class App(hass.Hass):
         self.is_active[name] = new == "off" if os.environ.get("DEV") == "true" else new == "on"
 
     def datetime_str(self) -> str:
-        return dt.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+        return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # format in %Y-%m-%d %H:%M:%S
 
-    def bool_state(
+    async def bool_state(
         self,
         entity_id: str = None,
         default: Any = None,
         copy: bool = True,
         **kwargs: Optional[Any],
     ) -> Any:
-        return super().get_state(entity_id, None, default, copy, **kwargs) == "on"
+        state = await super().get_state(entity_id, None, default, copy, **kwargs)
+        if state == "on":
+            return True
+        elif state == "off":
+            return False
+        else:
+            raise ValueError(f"State of {entity_id} is not on or off.")
 
 
 def toggle(name):
