@@ -6,13 +6,13 @@ from utils.base import App, toggle
 
 
 class Schedule(App):
-    async def initialize(self):
-        await super().initialize()
+    def initialize(self):
+        super().initialize()
         time = dt_time(2, 00, 0)
-        await self.run_daily(self.schedule_events, time)
+        self.run_daily(self.schedule_events, time)
 
     @toggle("schedule")
-    async def schedule_events(self, *args, **kwargs):
+    def schedule_events(self, *args, **kwargs):
         current_date = datetime.now().date()
         weekday = current_date.weekday()
 
@@ -47,7 +47,7 @@ class Schedule(App):
             dt = datetime.combine(current_date, time)
             if prev_event:
                 end_dt = dt
-                await self.call_service(
+                self.call_service(
                     "calendar/create_event",
                     summary=prev_event,
                     start_date_time=prev_time.isoformat(),

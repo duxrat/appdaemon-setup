@@ -9,10 +9,10 @@ class Light(App):
         super().__init__(*args, **kwargs)
         self.timer = None
 
-    async def initialize(self):
-        await super().initialize()
-        await self.listen_state(self.motion_on, "binary_sensor.motion_" + self.args["sensor"], new="on")
-        await self.listen_state(
+    def initialize(self):
+        super().initialize()
+        self.listen_state(self.motion_on, "binary_sensor.motion_" + self.args["sensor"], new="on")
+        self.listen_state(
             self.motion_off,
             "binary_sensor.motion_" + self.args["sensor"],
             new="off",
@@ -20,12 +20,12 @@ class Light(App):
         )
 
     @toggle("light")
-    async def motion_on(self):
-        await self.turn_on("light." + self.args["light"])
+    def motion_on(self):
+        self.turn_on("light." + self.args["light"])
 
     @toggle("light")
-    async def motion_off(self):
-        await self.turn_off("light." + self.args["light"])
+    def motion_off(self):
+        self.turn_off("light." + self.args["light"])
 
 
 # class Light(App):
@@ -33,17 +33,17 @@ class Light(App):
 #         super().__init__(*args, **kwargs)
 #         self.timer = None
 #
-#     async def initialize(self):
-#         await super().initialize()
-#         await self.listen_state(self.motion, "binary_sensor.motion_" + self.args["sensor"])
+#     def initialize(self):
+#         super().initialize()
+#         self.listen_state(self.motion, "binary_sensor.motion_" + self.args["sensor"])
 #
 #     @toggle("light")
-#     async def motion(self):
+#     def motion(self):
 #         if new == "on":
-#             await self.turn_on("light." + self.args["light"])
+#             self.turn_on("light." + self.args["light"])
 #             # If there's a timer running, cancel it
 #             if self.timer is not None:
-#                 await self.cancel_timer(self.timer)
+#                 self.cancel_timer(self.timer)
 #                 self.timer = None
 #         else:
 #             # If motion stops, start the timer

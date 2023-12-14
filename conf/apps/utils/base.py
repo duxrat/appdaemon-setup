@@ -1,28 +1,29 @@
-from datetime import datetime
 import inspect
 import os
+from datetime import datetime
 from functools import wraps
 from typing import Any, Optional, Callable, Union
 
+import datetime as dt
 import appdaemon.plugins.hass.hassapi as hass
 
 entity_prefix = "input_boolean.conf_app_"
 apps = ["dev", "light", "checks", "schedule", "music", "project", "sleep", "sequence"]
 
 
-async def nop():
+def nop():
     return
 
 
 class App(hass.Hass):
-    async def initialize(self):
+    def initialize(self):
         self.is_active = {}
         for name in apps:
-            state = await self.get_state(f"{entity_prefix}{name}")
+            state = self.get_state(f"{entity_prefix}{name}")
             self.is_active[name] = state == "off" if os.environ.get("DEV") == "true" else state == "on"
-            await self.listen_state(self.make_toggle, f"{entity_prefix}{name}")
+            self.listen_state(self.make_toggle, f"{entity_prefix}{name}")
 
-    async def make_toggle(self, entity, attribute, old, new, kwargs):
+    def make_toggle(self, entity, attribute, old, new, kwargs):
         name = entity.split(entity_prefix)[1]
         self.is_active[name] = new == "off" if os.environ.get("DEV") == "true" else new == "on"
 
@@ -30,28 +31,42 @@ class App(hass.Hass):
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # format in %Y-%m-%d %H:%M:%S
 
-    async def listen_state(
+    def listen_state(
         self, callback: Callable, entity_id: Union[str, list] = None, now=False, **kwargs: Optional[Any]
-    ) -> Union[str, list]:
+    ) -> Union[Any, str, list]:
         if now:
-            state = await self.get_state(entity_id)
-            await callback(state)
-        return await super().listen_state(callback, entity_id, **kwargs)
+            state = self.get_state(entity_id)
+            callback(state)
+        return super().listen_state(callback, entity_id, **kwargs)
 
-    async def bool_state(
+    def bool_state(
         self,
         entity_id: str = None,
         default: Any = None,
         copy: bool = True,
         **kwargs: Optional[Any],
     ) -> Any:
-        state = await super().get_state(entity_id, None, default, copy, **kwargs)
+        state = super().get_state(entity_id, None, default, copy, **kwargs)
         if state == "on":
             return True
         elif state == "off":
             return False
         else:
             raise ValueError(f"State of {entity_id} is not on or off.")
+
+    # redefining methods without async as PyCharm doesn't infer that @utils.sync_wrapper
+    # makes return type not Coroutine when called without await
+    def get_state(self, *args, **kwargs):
+        return super().get_state(*args, **kwargs)
+
+    def datetime(self, *args, **kwargs) -> dt.datetime:
+        return super().datetime(*args, **kwargs)
+
+    def parse_datetime(self, *args, **kwargs) -> dt.datetime:
+        return super().parse_datetime(*args, **kwargs)
+
+    def run_every(self, *args, **kwargs) -> str:
+        return super().run_every(*args, **kwargs)
 
 
 def toggle(name):
@@ -62,19 +77,19 @@ def toggle(name):
         sig = inspect.signature(func)
 
         @wraps(func)
-        async def wrapper(self, *args, **kwargs):
+        def wrapper(self, *args, **kwargs):
             if self.is_active[name]:
                 if len(args) == 0:
-                    return await func(self)
+                    return func(self)
                 elif len(args) == 1:
-                    return await func(self, args[0])
+                    return func(self, args[0])
                 elif len(sig.parameters) == 2:
-                    return await func(self, args[3])
+                    return func(self, args[3])
                 elif len(sig.parameters) > 2:
-                    return await func(self, *args)
+                    return func(self, *args)
                 else:
-                    return await func(self)
-            return await nop()
+                    return func(self)
+            return nop()
 
         return wrapper
 
