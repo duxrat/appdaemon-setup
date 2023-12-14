@@ -2,12 +2,12 @@ from datetime import datetime
 import inspect
 import os
 from functools import wraps
-from typing import Any, Optional
+from typing import Any, Optional, Callable, Union
 
 import appdaemon.plugins.hass.hassapi as hass
 
 entity_prefix = "input_boolean.conf_app_"
-apps = ["dev", "light", "checks", "schedule", "music", "project", "sleep"]
+apps = ["dev", "light", "checks", "schedule", "music", "project", "sleep", "sequence"]
 
 
 async def nop():
@@ -29,6 +29,14 @@ class App(hass.Hass):
     def datetime_str(self) -> str:
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         # format in %Y-%m-%d %H:%M:%S
+
+    async def listen_state(
+        self, callback: Callable, entity_id: Union[str, list] = None, now=False, **kwargs: Optional[Any]
+    ) -> Union[str, list]:
+        if now:
+            state = await self.get_state(entity_id)
+            await callback(state)
+        return await super().listen_state(callback, entity_id, **kwargs)
 
     async def bool_state(
         self,
@@ -56,7 +64,11 @@ def toggle(name):
         @wraps(func)
         async def wrapper(self, *args, **kwargs):
             if self.is_active[name]:
-                if len(sig.parameters) == 2:
+                if len(args) == 0:
+                    return await func(self)
+                elif len(args) == 1:
+                    return await func(self, args[0])
+                elif len(sig.parameters) == 2:
                     return await func(self, args[3])
                 elif len(sig.parameters) > 2:
                     return await func(self, *args)

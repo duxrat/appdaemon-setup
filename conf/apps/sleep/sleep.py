@@ -23,7 +23,7 @@ class Sleep(App):
         await self.select_option("input_select.project", "Sleep" if new == "on" else "sleepy")
 
     @toggle("sleep")
-    async def bed_occupied(self, new):
+    async def bed_occupied(self):
         calendar_sleep = await self.bool_state("calendar.sleep")
         bed_occupied = await self.bool_state("binary_sensor.bed_occupied")
 
@@ -48,7 +48,7 @@ class Sleep(App):
                     entity_id="calendar.sleep",
                     summary="Sleep",
                     start_date_time=self.datetime_str(),
-                    end_date_time=(datetime.now() + timedelta(hours=2, minutes=35)).strftime("%Y-%m-%d %H:%M:%S"),
+                    end_date_time=(datetime.now() + timedelta(hours=2, minutes=20)).strftime("%Y-%m-%d %H:%M:%S"),
                 )
             else:
                 self.occupied_bell_handle = await self.run_every(
@@ -64,7 +64,7 @@ class Sleep(App):
             await self.turn_on("switch.bedroom_alarm")
 
     @toggle("sleep")
-    async def bed_left(self, new):
+    async def bed_left(self):
         await self.turn_off("switch.bedroom_alarm")
 
         if self.occupied_bell_handle:
