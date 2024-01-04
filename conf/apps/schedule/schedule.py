@@ -2,16 +2,15 @@ import json
 import os
 from datetime import datetime, timedelta, time as dt_time
 
-from utils.base import App, toggle
+from utils.base import App, args
 
 
 class Schedule(App):
     def initialize(self):
-        super().initialize()
         time = dt_time(2, 00, 0)
         self.run_daily(self.schedule_events, time)
 
-    @toggle("schedule")
+    @args
     def schedule_events(self, *args, **kwargs):
         current_date = datetime.now().date()
         weekday = current_date.weekday()

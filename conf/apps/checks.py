@@ -1,22 +1,23 @@
 from datetime import datetime, timedelta
 
-from utils.base import App, toggle
+from utils.base import App, args
 from utils.bots import bots
 from utils.constants import date_format
 
 
 class Checks(App):
     def initialize(self):
-        super().initialize()
+        self.listen_log(self.log_error, "ERROR")
+
         self.listen_state(self.calendar_slots, "calendar.slots")
         self.listen_state(self.sleep_length, "calendar.slots", attribute="message")
         self.listen_state(self.sleep_length, "calendar.slots")
 
-    @toggle("checks")
+    @args
     def calendar_slots(self, *args):
         bots.checks("No slot assigned")
 
-    @toggle("checks")
+    @args
     def sleep_length(self, *args):
         state = self.get_state("calendar.slots", attribute="all")
         attributes = state["attributes"]

@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 
-from utils.base import App, toggle
+from utils.base import App, args
 
 
 class Sleep(App):
@@ -9,8 +9,6 @@ class Sleep(App):
         super().__init__(*args, **kwargs)
 
     def initialize(self):
-        super().initialize()
-
         self.listen_state(self.sleep, "calendar.sleep")
         self.listen_state(self.bed_occupied, "binary_sensor.bed_occupied", new="on")
         self.listen_state(self.bed_occupied_long, "binary_sensor.bed_occupied", new="on", duration=15)
@@ -18,11 +16,11 @@ class Sleep(App):
         self.listen_state(self.bed_occupied_long, "calendar.sleep", new="off", duration=15)
         self.listen_state(self.bed_left, "binary_sensor.bed_occupied", new="off")
 
-    @toggle("sleep")
+    @args
     def sleep(self, new):
         self.select_option("input_select.project", "Sleep" if new == "on" else "sleepy")
 
-    @toggle("sleep")
+    @args
     def bed_occupied(self):
         calendar_sleep = self.bool_state("calendar.sleep")
         bed_occupied = self.bool_state("binary_sensor.bed_occupied")
@@ -55,7 +53,7 @@ class Sleep(App):
                     lambda x: self.call_service("esphome/bedroom_bell"), "now", 4
                 )
 
-    @toggle("sleep")
+    @args
     def bed_occupied_long(self):
         calendar_sleep = self.bool_state("calendar.sleep")
         bed_occupied = self.bool_state("binary_sensor.bed_occupied")
@@ -63,7 +61,7 @@ class Sleep(App):
         if not calendar_sleep and bed_occupied:
             self.turn_on("switch.bedroom_alarm")
 
-    @toggle("sleep")
+    @args
     def bed_left(self):
         self.turn_off("switch.bedroom_alarm")
 

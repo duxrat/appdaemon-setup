@@ -1,4 +1,4 @@
-from utils.base import App, toggle
+from utils.base import App, args
 
 # todo: require args error on compile
 # todo: have a base with stuff like initialized variables like timer
@@ -10,7 +10,6 @@ class Light(App):
         self.timer = None
 
     def initialize(self):
-        super().initialize()
         self.listen_state(self.motion_on, "binary_sensor.motion_" + self.args["sensor"], new="on")
         self.listen_state(
             self.motion_off,
@@ -19,11 +18,11 @@ class Light(App):
             duration=self.args.get("duration", 60),
         )
 
-    @toggle("light")
+    @args
     def motion_on(self):
         self.turn_on("light." + self.args["light"])
 
-    @toggle("light")
+    @args
     def motion_off(self):
         self.turn_off("light." + self.args["light"])
 
@@ -37,7 +36,7 @@ class Light(App):
 #         super().initialize()
 #         self.listen_state(self.motion, "binary_sensor.motion_" + self.args["sensor"])
 #
-#     @toggle("light")
+#     @toggle
 #     def motion(self):
 #         if new == "on":
 #             self.turn_on("light." + self.args["light"])
