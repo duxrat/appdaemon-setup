@@ -10,10 +10,13 @@ class Sleep(App):
 
     def initialize(self):
         self.listen_state(self.sleep, "calendar.sleep")
+
         self.listen_state(self.bed_occupied, "binary_sensor.bed_occupied", new="on")
-        self.listen_state(self.bed_occupied_long, "binary_sensor.bed_occupied", new="on", duration=15)
         self.listen_state(self.bed_occupied, "calendar.sleep", new="off")
+
+        self.listen_state(self.bed_occupied_long, "binary_sensor.bed_occupied", new="on", duration=15)
         self.listen_state(self.bed_occupied_long, "calendar.sleep", new="off", duration=15)
+
         self.listen_state(self.bed_left, "binary_sensor.bed_occupied", new="off")
 
     @args
@@ -22,8 +25,8 @@ class Sleep(App):
 
     @args
     def bed_occupied(self):
-        calendar_sleep = self.bool_state("calendar.sleep")
         bed_occupied = self.bool_state("binary_sensor.bed_occupied")
+        calendar_sleep = self.bool_state("calendar.sleep")
 
         if not bed_occupied:
             return

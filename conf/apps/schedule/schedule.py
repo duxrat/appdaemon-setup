@@ -1,26 +1,26 @@
 import json
-import os
 from datetime import datetime, timedelta, time as dt_time
 
 from utils.base import App, args
+from utils.constants import local_path
 
 
 class Schedule(App):
     def initialize(self):
         time = dt_time(2, 00, 0)
         self.run_daily(self.schedule_events, time)
+        self.register_endpoint(self.schedule, "schedule")
+
+    def schedule(self, *args):
+        self.schedule_events()
+        return {}, 200
 
     @args
     def schedule_events(self, *args, **kwargs):
         current_date = datetime.now().date()
         weekday = current_date.weekday()
 
-        with open(
-            "conf/apps/schedule/schedule.json"
-            if os.environ.get("DEV") == "true"
-            else "/config/appdaemon/apps/apps/schedule/schedule.json",
-            "r",
-        ) as f:
+        with open(local_path + "apps/schedule/schedule.json") as f:
             schedule_data = {k: list(v.items()) for k, v in json.load(f).items()}
 
         if weekday == 4:

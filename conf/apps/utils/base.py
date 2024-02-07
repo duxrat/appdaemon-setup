@@ -1,10 +1,9 @@
+import datetime as dt
 import inspect
-import os
 from datetime import datetime
 from functools import wraps
 from typing import Any, Optional, Callable, Union
 
-import datetime as dt
 import appdaemon.plugins.hass.hassapi as hass
 
 entity_prefix = "input_boolean.conf_app_"
@@ -42,6 +41,11 @@ class App(hass.Hass):
         else:
             raise ValueError(f"State of {entity_id} is not on or off.")
 
+    def cancel_timer(self, handle: str, silent=False) -> bool:
+        if handle:
+            return super().cancel_timer(handle, silent)
+        return False
+
     # redefining methods without async as PyCharm doesn't infer that @utils.sync_wrapper
     # makes return type not Coroutine when called without await
     def get_state(self, *args, **kwargs):
@@ -52,6 +56,9 @@ class App(hass.Hass):
 
     def parse_datetime(self, *args, **kwargs) -> dt.datetime:
         return super().parse_datetime(*args, **kwargs)
+
+    def format_datetime(self, datetime) -> str:
+        return datetime.strftime("%Y-%m-%d %H:%M:%S")
 
     def run_every(self, *args, **kwargs) -> str:
         return super().run_every(*args, **kwargs)
