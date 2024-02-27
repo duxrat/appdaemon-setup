@@ -20,7 +20,7 @@ class Schedule(App):
         current_date = datetime.now().date()
         weekday = current_date.weekday()
 
-        with open(local_path + "apps/schedule/schedule.json") as f:
+        with open(local_path + "schedule/schedule.json") as f:
             schedule_data = {k: list(v.items()) for k, v in json.load(f).items()}
 
         if weekday == 4:
