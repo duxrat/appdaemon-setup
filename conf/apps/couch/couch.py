@@ -18,7 +18,7 @@ class Couch(App):
 
     @args
     def couch_occupied(self):
-        couch_occupied = self.bool_state("binary_sensor.couch_occupied")
+        couch_occupied = self.get_state("binary_sensor.couch_occupied")
         work = self.get_state("sensor.slot") == "Work"
 
         if work and couch_occupied:
@@ -26,7 +26,7 @@ class Couch(App):
 
     @args
     def couch_occupied_long(self):
-        couch_occupied = self.bool_state("binary_sensor.couch_occupied")
+        couch_occupied = self.get_state("binary_sensor.couch_occupied")
         work = self.get_state("sensor.slot") == "Work"
 
         if work and couch_occupied:
