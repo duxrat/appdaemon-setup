@@ -497,17 +497,7 @@ class State:
     async def get_state(self, name, namespace, entity_id=None, attribute=None, default=None, copy=True):
         self.logger.debug("get_state: %s.%s %s %s", entity_id, attribute, default, copy)
 
-        # ---------- MODIFIED SECTION ----------
-        # was: maybe_copy = lambda data: deepcopy(data) if copy else data  # noqa: E731
-        def maybe_copy(data):
-            data = deepcopy(data) if copy else data
-            if data == "on":
-                return True
-            elif data == "off":
-                return False
-            return data
-
-        # ---------- END  ----------
+        maybe_copy = lambda data: deepcopy(data) if copy else data  # noqa: E731
 
         if entity_id is not None and "." in entity_id:
             if not await self.entity_exists(namespace, entity_id):

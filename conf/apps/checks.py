@@ -7,8 +7,6 @@ from utils.constants import date_format
 
 class Checks(App):
     def initialize(self):
-        # todo: log to telegram
-        # self.listen_log(self.log_error, "ERROR")
         x = self.get_history(entity_id="sensor.band_battery", days=10)
         self.set_state("sensor.band_battery", state=x[0][-1]["state"] if x else "0")
 

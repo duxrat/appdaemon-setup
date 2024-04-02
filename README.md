@@ -1,4 +1,14 @@
-# Description
+This repository contains a fork of [appdaemon](https://github.com/AppDaemon/appdaemon) with added:
+
+- code for my automations at `/conf/apps`
+- heavy customizations/wrappers for core elements of appdaemon API that make it more ergonomic/clean to write automations with (especially listening to changes in multiple events)
+- deploy script in the `Makefile`
+
+I managed to set up a workflow where appdaemon source code runs alongside automations code for easy customization/debugging. Most importantly, this way it's possible to run it directly in the IDE and have access to the debugger while developing on the local copy of automations.
+
+Once happy with automations, deploy script copies their code into whatever server is running it. Apps are loaded conditionally based on HA input_boolean's as configured in apps.yaml, so it's easy to switch them between dev and live mode.
+
+---
 
 AppDaemon is a loosely coupled, multi-threaded, sandboxed python
 execution environment for writing automation apps for various types of Home Automation Software including [Home

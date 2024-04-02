@@ -1,0 +1,46 @@
+---
+light_bedroom:
+  module: light
+  class: Light
+  sensor: bedroom_space_occupancy
+  light: hue_bedroom
+  constrain_input_boolean: input_boolean.conf_app_light,off
+
+schedule:
+  module: schedule
+  class: Schedule
+  constrain_input_boolean: input_boolean.conf_app_schedule,off
+
+checks:
+  module: checks
+  class: Checks
+  constrain_input_boolean: input_boolean.conf_app_checks,off
+
+music:
+  module: music
+  class: Music
+  constrain_input_boolean: input_boolean.conf_app_music,off
+
+project:
+  module: project
+  class: Project
+  constrain_input_boolean: input_boolean.conf_app_project,off
+
+sleep:
+  module: sleep
+  class: Sleep
+  constrain_input_boolean: input_boolean.conf_app_sleep,off
+  
+#oversleep:
+#  module: oversleep
+#  class: Oversleep
+
+sequence_:
+  module: sequence
+  class: Sequence
+  constrain_input_boolean: input_boolean.conf_app_sequence,off
+
+couch:
+  module: couch
+  class: Couch
+  constrain_input_boolean: input_boolean.conf_app_couch,off

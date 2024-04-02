@@ -17,10 +17,10 @@ class Sleep(App):
 
         @self.listen([e("binary_sensor.bed_occupied", new="on"), e("calendar.sleep", new="off")])
         def bed_occupied(bed_occupied, sleep):
-            if not bed_occupied:
+            if not bed_occupied == "on":
                 return
 
-            if sleep:
+            if sleep == "on":
                 self.turn_off("light.hue_bedroom")
             else:
                 slot = self.get_state("calendar.slots", "message")

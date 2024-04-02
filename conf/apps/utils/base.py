@@ -15,7 +15,6 @@ def nop():
 class App(hass.Hass):
     def datetime_str(self) -> str:
         return datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-        # format in %Y-%m-%d %H:%M:%S
 
     def cancel_timer(self, handle: str, silent=False) -> bool:
         if handle:

@@ -1,3 +1,7 @@
 test
 # avoid commitinng configuration files used during development of Docker build
-*.yaml
+*.json
+apps.prod
+apps/secrets.py
+sequence_/
+appdaemon.yaml
