@@ -8,6 +8,19 @@ I managed to set up a workflow where appdaemon source code runs alongside automa
 
 Once happy with automations, deploy script copies their code into whatever server is running it. Apps are loaded conditionally based on HA input_boolean's as configured in apps.yaml, so it's easy to switch them between dev and live mode.
 
+### How to run it
+
+IMPORTANT: use python **3.8**
+
+more context why in `conf/apps/utils/base.py`
+
+- create virtualenv: `python3.8 -m venv env`
+- activate it: `source ./env/bin/activate`
+- install packages: `pip install -r requirements.txt`
+- run it: `python -m appdaemon -c /Users/yepdev/projects/appdaemon/conf/`
+
+Or set up the same in IDE 
+
 ---
 
 AppDaemon is a loosely coupled, multi-threaded, sandboxed python
