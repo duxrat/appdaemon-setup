@@ -19,7 +19,8 @@ more context why in `conf/apps/utils/base.py`
 - install packages: `pip install -r requirements.txt`
 - run it: `python -m appdaemon -c /Users/yepdev/projects/appdaemon/conf/`
 
-Or set up the same in IDE 
+Or set up the same in IDE:
+![](https://raw.githubusercontent.com/yep-dev/appdaemon/master/docs/run-conf.png)
 
 ---
 
